@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="10 seconds">
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder charset="UTF-8">
+            <pattern>[%date{"yyyy-MM-dd'T'HH:mm:ss.SSSXXX", UTC}] [%-30.30logger{30}#%-15.15(%thread)] -> [%-5.5level] %replace(%msg){'\n','\\n'} %replace(%xException){'\n','\\n'}%nopex%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="stdout"/>
+    </root>
+
+    <logger name="org.mockserver.mock.HttpStateHandler" level="ERROR"/>
+    <logger name="org.apache.kafka" level="ERROR"/>
+    <logger name="org.apache.zookeeper" level="ERROR"/>
+    <logger name="kafka" level="ERROR"/>
+    <logger name="akka" level="ERROR"/>
+    <logger name="org.apache.flink" level="WARN"/>
+
+</configuration>
