@@ -17,12 +17,12 @@
 ###############################################################################
 
 ## Use jdk as base image
-FROM openjdk:8-jdk
+FROM airdock/oraclejdk:1.8
 
 # Install dependencies
 RUN set -ex; \
   apt-get update; \
-  apt-get -y install libsnappy1v5 gettext-base; \
+  apt-get -y install libsnappy-dev gettext-base wget; \
   rm -rf /var/lib/apt/lists/*
 
 # Grab gosu for easy step-down from root
@@ -39,14 +39,13 @@ RUN set -ex; \
       gpg --batch --keyserver "$server" --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 && break || : ; \
   done && \
   gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
-  gpgconf --kill all; \
   rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc; \
   chmod +x /usr/local/bin/gosu; \
   gosu nobody true
 
 # Configure Flink version
-ENV FLINK_TGZ_URL=https://www.apache.org/dyn/closer.cgi?action=download&filename=flink/flink-1.9.3/flink-1.9.3-bin-scala_2.12.tgz \
-    FLINK_ASC_URL=https://www.apache.org/dist/flink/flink-1.9.3/flink-1.9.3-bin-scala_2.12.tgz.asc \
+ENV FLINK_TGZ_URL=https://archive.apache.org/dist/flink/flink-1.9.3/flink-1.9.3-bin-scala_2.12.tgz\
+    FLINK_ASC_URL=https://archive.apache.org/dist/flink/flink-1.9.3/flink-1.9.3-bin-scala_2.12.tgz.asc \
     GPG_KEY=6B6291A8502BA8F0913AE04DDEB95B05BF075300 \
     SKIP_GPG=false
 
@@ -72,7 +71,6 @@ RUN set -ex; \
         gpg --batch --keyserver "$server" --recv-keys "$GPG_KEY" && break || : ; \
     done && \
     gpg --batch --verify flink.tgz.asc flink.tgz; \
-    gpgconf --kill all; \
     rm -rf "$GNUPGHOME" flink.tgz.asc; \
   fi; \
   \
