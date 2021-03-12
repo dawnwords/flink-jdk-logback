@@ -22,7 +22,7 @@ FROM airdock/oraclejdk:1.8
 # Install dependencies
 RUN set -ex; \
   apt-get update; \
-  apt-get -y install libsnappy-dev gettext-base wget; \
+  apt-get -y install libsnappy-dev gettext-base wget unzip; \
   rm -rf /var/lib/apt/lists/*
 
 # Grab gosu for easy step-down from root
@@ -95,6 +95,11 @@ RUN rm /opt/flink/conf/log4j* && \
 	rm /opt/flink/lib/slf4j-log4j12-1.7.15.jar && \
 	wget --quiet https://repo1.maven.org/maven2/ch/qos/logback/logback-classic/${LOGBACK_VERSION}/logback-classic-${LOGBACK_VERSION}.jar -O /opt/flink/lib/logback-classic-${LOGBACK_VERSION}.jar && \
 	wget --quiet https://repo1.maven.org/maven2/ch/qos/logback/logback-core/${LOGBACK_VERSION}/logback-core-${LOGBACK_VERSION}.jar -O /opt/flink/lib/logback-core-${LOGBACK_VERSION}.jar && \
-	wget --quiet https://repo1.maven.org/maven2/org/slf4j/log4j-over-slf4j/${SLF4J_VERSION}/log4j-over-slf4j-${SLF4J_VERSION}.jar -O /opt/flink/lib/log4j-over-slf4j-${SLF4J_VERSION}.jar
+	wget --quiet https://repo1.maven.org/maven2/org/slf4j/log4j-over-slf4j/${SLF4J_VERSION}/log4j-over-slf4j-${SLF4J_VERSION}.jar -O /opt/flink/lib/log4j-over-slf4j-${SLF4J_VERSION}.jar && \
+  wget --quiet https://arthas.aliyun.com/download/latest_version?mirror=aliyun -O /opt/flink/arthas-bin.zip && \
+  wget https://arthas.aliyun.com/download/latest_version?mirror=aliyun -O /opt/flink/arthas-bin.zip && \
+  unzip /opt/flink/arthas-bin.zip -d /opt/flink/arthas-bin && \
+  rm -f /opt/flink/arthas-bin.zip
+
 
 ADD logback.xml /opt/flink/conf/logback-console.xml
