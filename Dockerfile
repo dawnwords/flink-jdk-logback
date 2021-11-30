@@ -44,10 +44,10 @@ RUN set -ex; \
   gosu nobody true
 
 # Configure Flink version
-ENV FLINK_TGZ_URL=https://archive.apache.org/dist/flink/flink-1.9.3/flink-1.9.3-bin-scala_2.12.tgz\
-    FLINK_ASC_URL=https://archive.apache.org/dist/flink/flink-1.9.3/flink-1.9.3-bin-scala_2.12.tgz.asc \
-    GPG_KEY=6B6291A8502BA8F0913AE04DDEB95B05BF075300 \
-    SKIP_GPG=false
+ENV FLINK_TGZ_URL=https://www.apache.org/dyn/closer.cgi?action=download&filename=flink/flink-1.14.0/flink-1.14.0-bin-scala_2.12.tgz \
+    FLINK_ASC_URL=https://www.apache.org/dist/flink/flink-1.14.0/flink-1.14.0-bin-scala_2.12.tgz.asc \
+    GPG_KEY=31D2DD10BFC15A2D \
+    CHECK_GPG=true
 
 # Prepare environment
 ENV FLINK_HOME=/opt/flink
@@ -60,7 +60,7 @@ WORKDIR $FLINK_HOME
 RUN set -ex; \
   wget -nv -O flink.tgz "$FLINK_TGZ_URL"; \
   \
-  if [ "$SKIP_GPG" = "false" ]; then \
+  if [ "$CHECK_GPG" = "true" ]; then \
     wget -nv -O flink.tgz.asc "$FLINK_ASC_URL"; \
     export GNUPGHOME="$(mktemp -d)"; \
     for server in ha.pool.sks-keyservers.net $(shuf -e \
@@ -91,11 +91,14 @@ ARG LOGBACK_VERSION=1.2.3
 ARG SLF4J_VERSION=1.7.25
 
 RUN rm /opt/flink/conf/log4j* && \
-	rm /opt/flink/lib/log4j-1.2.17.jar && \
-	rm /opt/flink/lib/slf4j-log4j12-1.7.15.jar && \
-	wget --quiet https://repo1.maven.org/maven2/ch/qos/logback/logback-classic/${LOGBACK_VERSION}/logback-classic-${LOGBACK_VERSION}.jar -O /opt/flink/lib/logback-classic-${LOGBACK_VERSION}.jar && \
-	wget --quiet https://repo1.maven.org/maven2/ch/qos/logback/logback-core/${LOGBACK_VERSION}/logback-core-${LOGBACK_VERSION}.jar -O /opt/flink/lib/logback-core-${LOGBACK_VERSION}.jar && \
-	wget --quiet https://repo1.maven.org/maven2/org/slf4j/log4j-over-slf4j/${SLF4J_VERSION}/log4j-over-slf4j-${SLF4J_VERSION}.jar -O /opt/flink/lib/log4j-over-slf4j-${SLF4J_VERSION}.jar && \
+  rm -f /opt/flink/lib/*log4j* && \
+  mkdir -p /opt/flink/tmp-dir && \
+  mkdir -p /opt/flink/state-backend && \
+  chown -R flink:flink /opt/flink/tmp-dir && \
+  chown -R flink:flink /opt/flink/state-backend && \
+  wget --quiet https://repo1.maven.org/maven2/ch/qos/logback/logback-classic/${LOGBACK_VERSION}/logback-classic-${LOGBACK_VERSION}.jar -O /opt/flink/lib/logback-classic-${LOGBACK_VERSION}.jar && \
+  wget --quiet https://repo1.maven.org/maven2/ch/qos/logback/logback-core/${LOGBACK_VERSION}/logback-core-${LOGBACK_VERSION}.jar -O /opt/flink/lib/logback-core-${LOGBACK_VERSION}.jar && \
+  wget --quiet https://repo1.maven.org/maven2/org/slf4j/log4j-over-slf4j/${SLF4J_VERSION}/log4j-over-slf4j-${SLF4J_VERSION}.jar -O /opt/flink/lib/log4j-over-slf4j-${SLF4J_VERSION}.jar && \
   wget --quiet https://arthas.aliyun.com/download/latest_version?mirror=aliyun -O /opt/flink/arthas-bin.zip && \
   wget https://arthas.aliyun.com/download/latest_version?mirror=aliyun -O /opt/flink/arthas-bin.zip && \
   unzip /opt/flink/arthas-bin.zip -d /opt/flink/arthas-bin && \
@@ -103,3 +106,5 @@ RUN rm /opt/flink/conf/log4j* && \
 
 
 ADD logback.xml /opt/flink/conf/logback-console.xml
+
+VOLUME ["/opt/flink/tmp-dir", "/opt/flink/state-backend"]

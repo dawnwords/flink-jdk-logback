@@ -12,11 +12,17 @@
         <appender-ref ref="stdout"/>
     </root>
 
-    <logger name="org.mockserver.mock.HttpStateHandler" level="ERROR"/>
     <logger name="org.apache.kafka" level="ERROR"/>
     <logger name="org.apache.zookeeper" level="ERROR"/>
     <logger name="kafka" level="ERROR"/>
     <logger name="akka" level="ERROR"/>
     <logger name="org.apache.flink" level="WARN"/>
+    <logger name="io.jaegertracing" level="WARN"/>
+    <logger name="org.apache.flink.runtime.executiongraph" level="INFO"/>
+    <logger name="org.apache.flink.runtime.scheduler" level="INFO"/>
+    <logger name="org.apache.flink.runtime.checkpoint" level="INFO"/>
+
+    <logger name="org.apache.flink.runtime.rest.handler.job.JobDetailsHandler" level="OFF"/>
+    <logger name="org.apache.flink.metrics.prometheus" level="OFF"/>
 
 </configuration>
